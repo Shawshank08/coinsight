@@ -4,13 +4,21 @@ import "./Home.css";
 
 const PREDICT_URL = "http://localhost:8080/predict";
 
+/** @param {unknown} v */
+function parsePredictionNumber(v) {
+  const n = parseFloat(String(v));
+  return Number.isFinite(n) ? n : null;
+}
+
 function formatUsd(n) {
-  if (typeof n !== "number" || Number.isNaN(n)) return "—";
+  const num =
+    typeof n === "number" && Number.isFinite(n) ? n : parseFloat(String(n));
+  if (!Number.isFinite(num)) return "—";
   return new Intl.NumberFormat(undefined, {
     style: "currency",
     currency: "USD",
     maximumFractionDigits: 0,
-  }).format(n);
+  }).format(num);
 }
 
 export default function Home() {
@@ -36,9 +44,20 @@ export default function Home() {
         return;
       }
 
-      setPrediction(data.prediction);
-      setLowerBound(data.lower_bound);
-      setUpperBound(data.upper_bound);
+      const pred = parsePredictionNumber(data.prediction);
+      const lower = parsePredictionNumber(data.lower_bound);
+      const upper = parsePredictionNumber(data.upper_bound);
+      if (pred === null || lower === null || upper === null) {
+        setError("Invalid prediction data");
+        setPrediction(null);
+        setLowerBound(null);
+        setUpperBound(null);
+        return;
+      }
+
+      setPrediction(pred);
+      setLowerBound(lower);
+      setUpperBound(upper);
     } catch {
       setError("Could not reach the server");
       setPrediction(null);
@@ -50,29 +69,25 @@ export default function Home() {
   }, []);
 
   const hasResult =
-    prediction != null && lowerBound != null && upperBound != null;
+    typeof prediction === "number" &&
+    typeof lowerBound === "number" &&
+    typeof upperBound === "number" &&
+    Number.isFinite(prediction) &&
+    Number.isFinite(lowerBound) &&
+    Number.isFinite(upperBound);
 
   const chartSeries = useMemo(() => {
     if (!hasResult) return [];
-    // Two x points so the range area reads as a clear horizontal band.
-    const x1 = "Forecast";
-    const x2 = " ";
     return [
       {
         name: "Confidence interval",
         type: "rangeArea",
-        data: [
-          { x: x1, y: [lowerBound, upperBound] },
-          { x: x2, y: [lowerBound, upperBound] },
-        ],
+        data: [{ x: "Forecast", y: [lowerBound, upperBound] }],
       },
       {
         name: "Prediction",
         type: "line",
-        data: [
-          { x: x1, y: prediction },
-          { x: x2, y: prediction },
-        ],
+        data: [{ x: "Forecast", y: prediction }],
       },
     ];
   }, [hasResult, lowerBound, upperBound, prediction]);
@@ -98,12 +113,7 @@ export default function Home() {
       colors: ["#a855f7", "#7c3aed"],
       xaxis: {
         type: "category",
-        labels: {
-          show: true,
-          formatter(val) {
-            return val?.trim() ? val : "";
-          },
-        },
+        labels: { show: true },
         axisBorder: { show: false },
         axisTicks: { show: false },
       },
@@ -127,7 +137,30 @@ export default function Home() {
         shared: true,
         intersect: false,
         y: {
-          formatter(val) {
+          /**
+           * Combo rangeArea + line: Apex sets isRangeData and passes range
+           * start/end into the formatter. Line series has no range — val is
+           * undefined — so read y from config for that series.
+           */
+          formatter(val, opts) {
+            const { seriesIndex, dataPointIndex, w } = opts;
+            const ser = w?.config?.series?.[seriesIndex];
+            const lineMissingVal =
+              val === undefined ||
+              val === null ||
+              (typeof val === "number" && Number.isNaN(val));
+            if (ser?.type === "line" && lineMissingVal) {
+              const y = ser.data?.[dataPointIndex]?.y;
+              const n = parseFloat(String(y));
+              return Number.isFinite(n) ? formatUsd(n) : "—";
+            }
+            if (Array.isArray(val)) {
+              const lo = parseFloat(val[0]);
+              const hi = parseFloat(val[1]);
+              if (Number.isFinite(lo) && Number.isFinite(hi)) {
+                return `${formatUsd(lo)} – ${formatUsd(hi)}`;
+              }
+            }
             return formatUsd(val);
           },
         },
@@ -154,7 +187,7 @@ export default function Home() {
         {!loading && error && <p className="error">{error}</p>}
       </div>
 
-      {!loading && hasResult && chartSeries.length > 0 && (
+      {!loading && hasResult && (
         <div className="prediction-chart">
           <Chart
             options={chartOptions}
