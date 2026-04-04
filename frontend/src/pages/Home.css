@@ -1,0 +1,81 @@
+.prediction-panel {
+  max-width: 28rem;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  box-shadow: var(--shadow);
+}
+
+.prediction-panel h2 {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+  font-family: var(--heading);
+  color: var(--text-h);
+}
+
+.prediction-panel button {
+  font: inherit;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 2px solid var(--accent-border);
+  background: var(--accent-bg);
+  color: var(--text-h);
+  cursor: pointer;
+  transition: border-color 0.2s, opacity 0.2s;
+}
+
+.prediction-panel button:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.prediction-panel button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.prediction-panel .status {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+
+.prediction-panel .loading {
+  color: var(--text);
+}
+
+.prediction-panel .error {
+  color: #b91c1c;
+}
+
+@media (prefers-color-scheme: dark) {
+  .prediction-panel .error {
+    color: #fca5a5;
+  }
+}
+
+.prediction-panel .results {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.prediction-panel .results dt {
+  margin: 0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+.prediction-panel .results dd {
+  margin: 0.15rem 0 0;
+  font-family: var(--mono);
+  font-size: 1.05rem;
+  color: var(--text-h);
+}
+
+.prediction-panel .results .prediction-value dd {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--accent);
+}
