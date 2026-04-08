@@ -1,0 +1,61 @@
+version: "3.9"
+
+services:
+
+  # ── Redis (bonus: prediction caching) ─────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: coinsight-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ── Python ML service ──────────────────────────────────────────
+  ml-service:
+    build: ./ml-service
+    container_name: coinsight-ml
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount dataset from host — not baked into image (too large)
+      - ./ml-service/data:/app/data:ro
+    environment:
+      - BITCOIN_CSV_PATH=/app/data/btcusd_1-min_data.csv
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s   # model training takes time on first run
+
+  # ── Go backend ────────────────────────────────────────────────
+  backend-go:
+    build: ./backend-go
+    container_name: coinsight-go
+    ports:
+      - "8080:8080"
+    environment:
+      - ML_BASE_URL=http://ml-service:8000
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      redis:
+        condition: service_healthy
+      ml-service:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ── React frontend ────────────────────────────────────────────
+  frontend:
+    build: ./frontend
+    container_name: coinsight-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend-go
+    restart: unless-stopped

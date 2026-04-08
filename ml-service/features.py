@@ -20,14 +20,20 @@ def add_features(df: pd.DataFrame, price_col: str = "Close") -> pd.DataFrame:
         out[f"close_lag_{lag}"] = close.shift(lag)
 
     for window in ROLL_WINDOWS:
-        out[f"close_roll_mean_{window}"] = close.rolling(window, min_periods=window).mean()
+        out[f"close_roll_mean_{window}"] = close.rolling(
+            window, min_periods=window
+        ).mean()
 
     return out
 
 
 def feature_columns(df: pd.DataFrame) -> list[str]:
     """Column names used as model inputs (excludes raw OHLCV and target)."""
-    return [c for c in df.columns if c.startswith("close_lag_") or c.startswith("close_roll_mean_")]
+    return [
+        c
+        for c in df.columns
+        if c.startswith("close_lag_") or c.startswith("close_roll_mean_")
+    ]
 
 
 def add_target_next_close(df: pd.DataFrame, price_col: str = "Close") -> pd.DataFrame:
@@ -56,5 +62,7 @@ def latest_feature_row(df: pd.DataFrame, price_col: str = "Close") -> pd.DataFra
     cols = feature_columns(framed)
     ready = framed[cols].dropna()
     if ready.empty:
-        raise ValueError("Not enough history to build features (need max lag/roll window).")
+        raise ValueError(
+            "Not enough history to build features (need max lag/roll window)."
+        )
     return ready.iloc[[-1]]

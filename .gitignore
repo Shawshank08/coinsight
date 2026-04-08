@@ -1,28 +1,33 @@
-# Node
-node_modules/
-npm-debug.log*
+# ── Dataset (too large for GitHub) ───────────────────────────
+*.csv
+ml-service/data/
 
-# Python
+# ── Python ────────────────────────────────────────────────────
 __pycache__/
 *.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
 .env
 
-# Dataset
-*.csv
+# ── Node / Frontend ───────────────────────────────────────────
+node_modules/
+frontend/dist/
+npm-debug.log*
 
-# OS
+# ── Go ────────────────────────────────────────────────────────
+backend-go/bin/
+*.exe
+
+# ── OS ────────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
 
-# Logs
-*.log
-
-# Build
-dist/
-build/
-
-# VSCode / Cursor
+# ── Editor ────────────────────────────────────────────────────
 .vscode/
+.idea/
 
-# Go
-bin/
+# ── Logs ──────────────────────────────────────────────────────
+*.log

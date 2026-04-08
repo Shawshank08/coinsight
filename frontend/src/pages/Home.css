@@ -1,63 +1,211 @@
-.prediction-panel {
-  max-width: 36rem;
-  padding: 1.25rem;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--bg);
-  box-shadow: var(--shadow);
+/* ── Page ─────────────────────────────────────────────────────── */
+.cs-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.prediction-panel h2 {
-  margin: 0 0 1rem;
+/* ── Top row ──────────────────────────────────────────────────── */
+.cs-toprow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.cs-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cs-title {
+  margin: 0;
   font-size: 1.1rem;
-  font-family: var(--heading);
+  font-weight: 600;
   color: var(--text-h);
+  letter-spacing: -0.2px;
+  text-align: start;
 }
 
-.prediction-panel button {
-  font: inherit;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  border: 2px solid var(--accent-border);
-  background: var(--accent-bg);
-  color: var(--text-h);
+.cs-subtitle {
+  font-size: 0.76rem;
+  color: var(--text);
+  letter-spacing: 0.15px;
+}
+
+/* ── Actions ──────────────────────────────────────────────────── */
+.cs-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cs-retrain-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cs-live-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  color: var(--text);
   cursor: pointer;
-  transition: border-color 0.2s, opacity 0.2s;
+  user-select: none;
+  white-space: nowrap;
 }
 
-.prediction-panel button:hover:not(:disabled) {
-  border-color: var(--accent);
+.cs-live-toggle input[type="checkbox"] {
+  accent-color: var(--accent, #a855f7);
+  width: 13px;
+  height: 13px;
+  cursor: pointer;
 }
 
-.prediction-panel button:disabled {
-  opacity: 0.6;
+/* ── Buttons ──────────────────────────────────────────────────── */
+.cs-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 500 0.875rem/1 system-ui;
+  padding: 9px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity 0.15s, border-color 0.15s, background 0.15s;
+  white-space: nowrap;
+  border: 2px solid transparent;
+}
+
+.cs-btn:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-.prediction-panel .status {
-  margin-top: 1rem;
-  font-size: 0.95rem;
+.cs-btn-primary {
+  background: var(--accent-bg, rgba(168,85,247,0.12));
+  border-color: var(--accent-border, rgba(168,85,247,0.5));
+  color: var(--text-h);
 }
 
-.prediction-panel .loading {
+.cs-btn-primary:hover:not(:disabled) {
+  border-color: var(--accent, #a855f7);
+}
+
+.cs-btn-secondary {
+  background: rgba(100,116,139,0.08);
+  border-color: rgba(100,116,139,0.3);
+  color: var(--text-h);
+  font-size: 0.84rem;
+}
+
+.cs-btn-secondary:hover:not(:disabled) {
+  border-color: rgba(100,116,139,0.6);
+  background: rgba(100,116,139,0.14);
+}
+
+.cs-spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: cs-spin 0.65s linear infinite;
+}
+
+@keyframes cs-spin { to { transform: rotate(360deg); } }
+
+/* ── Banners ──────────────────────────────────────────────────── */
+.cs-banner {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  line-height: 1.4;
+}
+
+.cs-banner-error   { background: rgba(185,28,28,0.1);  border-color: rgba(185,28,28,0.3);  color: #fca5a5; }
+.cs-banner-success { background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.3); color: #6ee7b7; }
+.cs-banner-info    { background: rgba(99,102,241,0.1); border-color: rgba(99,102,241,0.3); color: #c7d2fe; }
+
+/* ── Prediction cards ─────────────────────────────────────────── */
+.cs-cards {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 640px) {
+  .cs-cards { grid-template-columns: 1fr; }
+}
+
+.cs-card {
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.cs-card-main {
+  border-color: rgba(168,85,247,0.3);
+  background: rgba(168,85,247,0.05);
+}
+
+.cs-card-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
   color: var(--text);
+  font-weight: 600;
 }
 
-.prediction-panel .error {
-  color: #b91c1c;
+.cs-card-value {
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--text-h);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
 }
 
-@media (prefers-color-scheme: dark) {
-  .prediction-panel .error {
-    color: #fca5a5;
-  }
+.cs-card-delta { font-size: 0.73rem; color: var(--text); }
+
+.cs-up      { color: #34d399 !important; }
+.cs-down    { color: #f87171 !important; }
+.cs-neutral { color: var(--text-h) !important; }
+
+/* ── Chart ────────────────────────────────────────────────────── */
+.cs-chart-wrap {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  padding: 4px 0 0;
+  background: var(--bg);
 }
 
-.prediction-chart {
-  margin-top: 1.25rem;
-  width: 100%;
+.cs-chart-error {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--text);
+  font-size: 0.9rem;
 }
 
-.prediction-chart .apexcharts-canvas {
-  margin: 0 auto;
+/* ── Hint ─────────────────────────────────────────────────────── */
+.cs-hint {
+  text-align: center;
+  font-size: 0.84rem;
+  color: var(--text);
+  margin: 0;
+  padding: 4px 0 8px;
 }
+
+.cs-hint strong { color: var(--text-h); }
