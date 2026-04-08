@@ -1,25 +1,13 @@
-FROM node:20-alpine AS builder
+FROM python:3.11-slim
 
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci
+RUN apt-get update && apt-get install -y curl
+# Install dependencies first (better layer caching)
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
 COPY . .
-RUN npm run build
 
-# ── Runtime: serve built files with nginx ──────────────────────
-FROM nginx:alpine
+EXPOSE 8000
 
-COPY --from=builder /app/dist /usr/share/nginx/html
-
-# Allow client-side routing to fall back to index.html
-RUN printf 'server {\n\
-  listen 80;\n\
-  root /usr/share/nginx/html;\n\
-  index index.html;\n\
-  location / {\n\
-    try_files $uri $uri/ /index.html;\n\
-  }\n\
-}\n' > /etc/nginx/conf.d/default.conf
-
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -236,23 +236,16 @@ export default function Home() {
       axisTicks: { show: false },
     },
     yaxis: {
-      min: Math.min(
-        ...history.map(d => d.low ?? d.y?.[2]),
-        lowerBound ?? Infinity,
-        prediction ?? Infinity
-      ) * 0.98,
-
-      max: Math.max(
-        ...history.map(d => d.high ?? d.y?.[1]),
-        upperBound ?? -Infinity,
-        prediction ?? -Infinity
-      ) * 1.02,
-
+      min: history.length > 0
+        ? Math.min(...history.map(d => d.low), prediction ?? Infinity) * 0.97
+        : undefined,
+      max: history.length > 0
+        ? Math.max(...history.map(d => d.high), prediction ?? -Infinity) * 1.03
+        : undefined,
       labels: {
         formatter: (val) => formatUsd(val),
         style: { colors: "#9ca3af", fontSize: "11px" },
       },
-
       tooltip: { enabled: true },
     },
     grid: {

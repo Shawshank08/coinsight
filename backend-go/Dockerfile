@@ -1,13 +1,21 @@
-FROM python:3.11-slim
+FROM golang:1.21-alpine AS builder
 
 WORKDIR /app
 
-# Install dependencies first (better layer caching)
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Download dependencies first (cached unless go.mod changes)
+COPY go.mod go.sum* ./
+RUN go mod download
 
+# Copy source and build
 COPY . .
+RUN go build -o coinsight-backend .
 
-EXPOSE 8000
+# ── Runtime image ──────────────────────────────────────────────
+FROM alpine:3.19
 
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+WORKDIR /app
+COPY --from=builder /app/coinsight-backend .
+
+EXPOSE 8080
+
+CMD ["./coinsight-backend"]

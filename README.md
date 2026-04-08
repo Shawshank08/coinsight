@@ -171,11 +171,11 @@ coinsight/
 │   ├── go.mod
 │   └── Dockerfile
 ├── frontend/
-│   └── src/
-│       ├── App.jsx         # Shell + live Binance ticker
-│       └── pages/
-│           ├── Home.jsx    # Chart, predictions, retrain
-│           └── Home.css
+│   ├── src/
+│   │   ├── App.jsx   # Shell + live Binance ticker
+│   │   └── pages/
+│   │       ├── Home.jsx  # Chart, predictions, retrain
+│   │       └── Home.css
 │   └── Dockerfile
 ├── docker-compose.yml
 ├── .gitignore
